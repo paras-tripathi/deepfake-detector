@@ -1,0 +1,29 @@
+model:
+  backbone: "efficientnet-b4"
+  input_size: 224
+  num_classes: 1
+  dropout: 0.4
+  pretrained: true
+
+training:
+  epochs: 20
+  batch_size: 32
+  learning_rate: 0.001
+  val_split: 0.2
+  seed: 42
+
+features:
+  gradcam: true
+  frequency_branch: true
+  face_alignment: true
+
+paths:
+  data_dir: "data/"
+  real_dir: "data/real/"
+  fake_dir: "data/fake/"
+  model_save: "models/best_model.pth"
+  logs: "models/training_logs.json"
+
+inference:
+  threshold: 0.5
+  device: "cuda"
