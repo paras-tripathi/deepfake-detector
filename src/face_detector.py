@@ -1,3 +1,5 @@
+from email.mime import image
+
 import cv2
 import numpy as np
 from facenet_pytorch import MTCNN
@@ -6,13 +8,28 @@ from src.config_reader import Config
 class FaceDetector:
     def __init__(self):
         self.cfg = Config()
-        self.detector = MTCNN()
+        self.detector = MTCNN(
+        keep_all=False,
+        device='cpu'
+    )
     
     def detect(self, image):
-        results = self.detector.detect_faces(image)
-        if not results:
-           return None
-        return results[0]  # Return the first detected face
+    # facenet_pytorch MTCNN direct
+        boxes, probs, landmarks = self.detector.detect(image, landmarks=True)
+    
+        if boxes is None:
+            return None
+    
+    # First face return
+        return {
+            'box': [int(boxes[0][0]), int(boxes[0][1]), 
+                    int(boxes[0][2]-boxes[0][0]), 
+                    int(boxes[0][3]-boxes[0][1])],
+            'keypoints': {
+                'left_eye': (int(landmarks[0][0][0]), int(landmarks[0][0][1])),
+                'right_eye': (int(landmarks[0][1][0]), int(landmarks[0][1][1])),
+        }
+    }
     
     def align(self, image, keypoints):
         left_eye = keypoints['left_eye']
